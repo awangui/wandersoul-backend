@@ -28,9 +28,9 @@ with app.app_context():
     db.create_all()
 
 #routes
-@app.route("/")
-def serve_react():
-    return send_from_directory(app.static_folder, "index.html")
+@app.route('/')
+def home():
+    return "Welcome to Wandersoul!"
 
 # @app.route('/users')
 # def get_users():
