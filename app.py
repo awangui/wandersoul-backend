@@ -1,7 +1,7 @@
 from flask import Flask,send_from_directory
 from flask_migrate import Migrate
-from server.config import Config
-from server.models.models import db, User, Destination 
+from config import Config
+from models.models import db, User, Destination 
 from flask_cors import CORS
 from flask import Flask, request, jsonify
 import os
