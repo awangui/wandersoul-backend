@@ -15,7 +15,7 @@ from flask import request
 
 app = Flask(__name__)
 app.config.from_object(Config)
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True,allow_headers=["Content-Type", "Authorization"])
 #Configure JWT
 app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600
