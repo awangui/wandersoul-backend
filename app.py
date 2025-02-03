@@ -138,6 +138,12 @@ def get_destinations():
 @app.route('/destinations/<int:id>', methods=['GET'])
 @jwt_required()
 def get_destination(id):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        return jsonify({"error": "Missing Authorization Header"}), 401
+    
+    print("Received Auth Header:", auth_header)  # Debugging
+    
     destination = Destination.query.get(id)
     if not destination:
         return jsonify({"error": "Destination not found"}), 404
