@@ -204,8 +204,9 @@ def add_guides():
         for item in data:
             name = item.get("name")
             bio = item.get("bio")
+            image = item.get("image")
             languages = item.get("languages")
-            # location = item.get("location")
+            location = item.get("location")
             contact_info = item.get("contact_info")
 
             # Validate required fields
@@ -216,7 +217,8 @@ def add_guides():
                 name=name,
                 bio=bio,
                 languages=languages,
-                # location=location,
+                image=image,
+                location=location,
                 contact_info=contact_info
             )
             db.session.add(new_guide)
@@ -230,7 +232,6 @@ def add_guides():
     except Exception as e:
         print("Error:", e)
         return {"error": str(e)}, 500  
-
 
 #admin routes
 @app.route('/admin', methods=['GET'])
@@ -267,6 +268,16 @@ def get_admin_destinations():
         return {"error": "You are not authorized to access this route"}, 401
     destinations = Destination.query.all()
     return {"destinations": [destination.to_dict() for destination in destinations]}
+
+@app.route('/admin/guides', methods=['GET'])
+@jwt_required()
+def get_admin_guides():
+    current_user = get_jwt_identity()
+    role_id = current_user["role_id"]
+    if role_id != 1:
+        return {"error": "You are not authorized to access this route"}, 401
+    guides = Guide.query.all()
+    return {"guides": [guide.to_dict() for guide in guides]}
 
 if __name__ == '__main__':
     app.run(debug=True)

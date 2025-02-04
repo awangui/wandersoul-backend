@@ -62,9 +62,10 @@ class Guide(db.Model):
     __tablename__ = 'guides'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    image = db.Column(db.String(500), nullable=False)
     bio = db.Column(db.String(500), nullable=False)
     languages = db.Column(db.String(200), nullable=False)
-    # location= db.Column(db.String(100), nullable=False)
+    location= db.Column(db.String(100), nullable=False)
     contact_info = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
@@ -74,7 +75,8 @@ class Guide(db.Model):
             'name': self.name,
             'bio': self.bio,
             'languages': self.languages,
-            # 'location': self.location,
+            'location': self.location,
+            'image': self.image,
             'contact_info': self.contact_info,
             'created_at': self.created_at,
         }
