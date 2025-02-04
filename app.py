@@ -343,6 +343,19 @@ def get_admin_guides():
     guides = Guide.query.all()
     return {"guides": [guide.to_dict() for guide in guides]}
 
+#get single guide route
+@app.route('/admin/guides/<int:id>', methods=['GET'])
+@jwt_required()
+def get_admin_guide(id):
+    current_user = get_jwt_identity()
+    role_id = current_user["role_id"]
+    if role_id != 1:
+        return {"error": "You are not authorized to access this route"}, 401
+    guide = Guide.query.get(id)
+    if not guide:
+        return {"error": "Guide not found"}, 404
+    return guide.to_dict(), 200
+
 #delete guide route
 @app.route('/admin/guides/<int:id>', methods=['DELETE'])
 @jwt_required()
