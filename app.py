@@ -259,6 +259,54 @@ def get_users():
         return {"error": "You are not authorized to access this route"}, 401
     users = User.query.all()
     return {"users": [user.to_dict() for user in users]}
+#delete user route
+@app.route('/admin/users/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(id):
+    current_user = get_jwt_identity()
+    role_id = current_user["role_id"]
+    if role_id != 1:
+        return {"error": "You are not authorized to access this route"}, 401
+    user = User.query.get(id)
+    if not user:
+        return {"error": "User not found"}, 404
+    db.session.delete(user)
+    db.session.commit()
+    return {"message": "User deleted successfully"}, 200
+#update user route
+@app.route('/admin/users/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_user(id):
+    current_user = get_jwt_identity()
+    role_id = current_user["role_id"]
+    if role_id != 1:
+        return {"error": "You are not authorized to access this route"}, 401
+    user = User.query.get(id)
+    if not user:
+        return {"error": "User not found"}, 404
+    data = request.get_json()
+    if not data:
+        return {"error": "Invalid request, no data provided"}, 400
+    fname = data.get("fname")
+    sname = data.get("sname")
+    email = data.get("email")
+    password = data.get("password")
+    role_id = data.get("role_id")
+    if fname:
+        user.fname = fname
+    if sname:
+        user.sname = sname
+    if email:
+        user.email = email
+    if password:
+        user.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    if role_id:
+        user.role_id = role_id
+    db.session.commit()
+    return user.to_dict(), 200
+
+
+#get destinations route
 @app.route('/admin/destinations', methods=['GET'])
 @jwt_required()
 def get_admin_destinations():
@@ -269,6 +317,22 @@ def get_admin_destinations():
     destinations = Destination.query.all()
     return {"destinations": [destination.to_dict() for destination in destinations]}
 
+#delete destination route
+@app.route('/admin/destinations/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_destination(id):
+    current_user = get_jwt_identity()
+    role_id = current_user["role_id"]
+    if role_id != 1:
+        return {"error": "You are not authorized to access this route"}, 401
+    destination = Destination.query.get(id)
+    if not destination:
+        return {"error": "Destination not found"}, 404
+    db.session.delete(destination)
+    db.session.commit()
+    return {"message": "Destination deleted successfully"}, 200
+
+#get guides route
 @app.route('/admin/guides', methods=['GET'])
 @jwt_required()
 def get_admin_guides():
@@ -278,6 +342,22 @@ def get_admin_guides():
         return {"error": "You are not authorized to access this route"}, 401
     guides = Guide.query.all()
     return {"guides": [guide.to_dict() for guide in guides]}
+
+#delete guide route
+@app.route('/admin/guides/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_guide(id):
+    current_user = get_jwt_identity()
+    role_id = current_user["role_id"]
+    if role_id != 1:
+        return {"error": "You are not authorized to access this route"}, 401
+    guide = Guide.query.get(id)
+    if not guide:
+        return {"error": "Guide not found"}, 404
+    db.session.delete(guide)
+    db.session.commit()
+    return {"message": "Guide deleted successfully"}, 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)
