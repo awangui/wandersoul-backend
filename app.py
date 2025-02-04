@@ -1,16 +1,13 @@
-from flask import Flask,send_from_directory
+from flask import Flask, send_from_directory, request, jsonify
 from flask_migrate import Migrate
 from config import Config
-from models.models import db, User, Destination 
+from models.models import db, User, Destination, Guide
 from flask_cors import CORS
-from flask import Flask, request, jsonify
-import os
 from flask_jwt_extended import (
     JWTManager, create_access_token, jwt_required, get_jwt_identity
 )
+import os
 import bcrypt
-# from faker import Faker
-from flask import request
 
 
 app = Flask(__name__)
@@ -190,6 +187,51 @@ def add_destinations():
     except Exception as e:
         print("Error:", e)
         return {"error": str(e)}, 500
+#guide routes
+@app.route('/guides', methods=['GET'])
+def get_guides():
+    guides = Guide.query.all()
+    return {"guides": [guide.to_dict() for guide in guides]}
+@app.route('/guides', methods=['POST'])
+def add_guides():
+    try:
+        data = request.get_json() 
+        if not data or not isinstance(data, list):
+            return {"error": "Invalid request, expected a list of guides"}, 400
+
+        new_guides = []
+        
+        for item in data:
+            name = item.get("name")
+            bio = item.get("bio")
+            languages = item.get("languages")
+            # location = item.get("location")
+            contact_info = item.get("contact_info")
+
+            # Validate required fields
+            if not name or not bio or not languages or not contact_info:
+                return {"error": f"Invalid request, missing required data for {name}"}, 400
+
+            new_guide = Guide(
+                name=name,
+                bio=bio,
+                languages=languages,
+                # location=location,
+                contact_info=contact_info
+            )
+            db.session.add(new_guide)
+            new_guides.append(new_guide)
+
+        db.session.commit()
+
+        return {"message": f"Successfully added {len(new_guides)} guides", 
+                "guides": [guide.to_dict() for guide in new_guides]}, 201
+
+    except Exception as e:
+        print("Error:", e)
+        return {"error": str(e)}, 500  
+
+
 #admin routes
 @app.route('/admin', methods=['GET'])
 @jwt_required()
